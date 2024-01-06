@@ -6,13 +6,13 @@ open Elmish.React
 open Feliz
 
 type Todo = {
-  Id : int
+  Id : Guid
   Description : string
   Completed : bool
 }
 
 type TodoBeingEdited = {
-  Id: int
+  Id: Guid
   Description: string
 }
 
@@ -25,22 +25,23 @@ type State = {
 type Msg =
   | SetNewTodo of string
   | AddNewTodo
-  | DeleteTodo of int
-  | ToggleCompleted of int
+  | DeleteTodo of Guid
+  | ToggleCompleted of Guid
   | CancelEdit
   | ApplyEdit
-  | StartEditingTodo of int
+  | StartEditingTodo of Guid
   | SetEditedDescription of string
 
 
 let init() = {
   TodoList = [
-    { Id = 1; Description = "Learn F#"; Completed = false }
-    { Id = 2; Description = "Learn Elmish"; Completed = true }
+    { Id = Guid("83bd80e8-067d-4316-ae9a-80abfe361247"); Description = "Learn F#"; Completed = false }
+    { Id = Guid("628cafbb-4030-47d0-826d-d77282b3dc36"); Description = "Learn Elmish"; Completed = true }
   ]
   NewTodo = ""
   TodoBeingEdited = None
-}
+  }
+
 
 let update (msg: Msg) (state: State) =
   match msg with
@@ -51,14 +52,7 @@ let update (msg: Msg) (state: State) =
       state
 
   | AddNewTodo ->
-      let nextTodoId =
-        match state.TodoList with
-        | [ ] -> 1
-        | elems ->
-            elems
-            |> List.maxBy (fun todo -> todo.Id)
-            |> fun todo -> todo.Id + 1
-
+      let nextTodoId = Guid.NewGuid()
       let nextTodo =
         { Id = nextTodoId
           Description = state.NewTodo
