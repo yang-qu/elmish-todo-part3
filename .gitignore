@@ -201,3 +201,6 @@ fable_modules/
 
 # Vite
 dist/
+
+# Jetbrains
+.idea/
