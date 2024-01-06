@@ -198,3 +198,6 @@ project.lock.json
 
 # Fable
 fable_modules/
+
+# Vite
+dist/

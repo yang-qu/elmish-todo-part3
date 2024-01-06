@@ -5,6 +5,7 @@
   "description": "",
   "scripts": {
     "build": "dotnet fable src -o dist -s --run vite build",
+    "preview": "dotnet fable src -o dist -s --run vite preview",
     "start": "dotnet fable watch src -o dist -s --run vite"
   },
   "keywords": [],
