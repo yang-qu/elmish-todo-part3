@@ -179,7 +179,9 @@ let renderTodo (todo: Todo) (dispatch: Msg -> unit) =
                                   prop.children [ Html.i [ prop.classes [ "fa"; "fa-times" ] ] ] ] ] ] ] ]
 
 
-let renderEditForm (todoBeingEdited: TodoBeingEdited) (dispatch: Msg -> unit) =
+let renderEditForm (state: State) (todoBeingEdited: TodoBeingEdited) (dispatch: Msg -> unit) =
+    let todo = state.TodoList |> List.filter (fun x -> x.Id = todoBeingEdited.Id) |> List.head
+    let noChange = todo.Description = todoBeingEdited.Description
     div
         [ "box" ]
         [ div
@@ -194,7 +196,7 @@ let renderEditForm (todoBeingEdited: TodoBeingEdited) (dispatch: Msg -> unit) =
                 div
                     [ "control"; "buttons" ]
                     [ Html.button
-                          [ prop.classes [ "button"; "is-primary" ]
+                          [ prop.classes [ "button"; if noChange then "is-outlined" else "is-primary" ]
                             prop.onClick (fun _ -> dispatch ApplyEdit)
                             prop.children [ Html.i [ prop.classes [ "fa"; "fa-save" ] ] ] ]
 
@@ -214,7 +216,7 @@ let todoList (state: State) (dispatch: Msg -> unit) =
         [ prop.children
               [ for todo in todoList ->
                     match state.TodoBeingEdited with
-                    | Some todoBeingEdited when todoBeingEdited.Id = todo.Id -> renderEditForm todoBeingEdited dispatch
+                    | Some todoBeingEdited when todoBeingEdited.Id = todo.Id -> renderEditForm state todoBeingEdited dispatch
                     | _ -> renderTodo todo dispatch ] ]
 
 let renderFilterTabs (state: State) (dispatch: Msg -> unit) =
