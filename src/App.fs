@@ -87,19 +87,24 @@ let update (msg: Msg) (state: State) =
         let nextEditModel =
             state.TodoList
             |> List.find (fun todo -> todo.Id = todoId)
-            |> (fun x -> { Id = x.Id; Description = x.Description })
+            |> (fun x ->
+                { Id = x.Id
+                  Description = x.Description })
 
         { state with
-            TodoBeingEdited = nextEditModel::state.TodoBeingEdited }
+            TodoBeingEdited = nextEditModel :: state.TodoBeingEdited }
 
-    | CancelEdit todoId -> { state with TodoBeingEdited = state.TodoBeingEdited |> List.filter (fun x -> x.Id <> todoId) }
+    | CancelEdit todoId ->
+        { state with
+            TodoBeingEdited = state.TodoBeingEdited |> List.filter (fun x -> x.Id <> todoId) }
 
     | ApplyEdit todoId ->
         let todo = List.filter (fun x -> x.Id = todoId) state.TodoBeingEdited
+
         match todo with
         | [] -> state
-        | todoBeingEdited::_ when todoBeingEdited.Description = "" -> state
-        | todoBeingEdited::_ ->
+        | todoBeingEdited :: _ when todoBeingEdited.Description = "" -> state
+        | todoBeingEdited :: _ ->
             let nextTodoList =
                 state.TodoList
                 |> List.map (fun todo ->
@@ -113,13 +118,14 @@ let update (msg: Msg) (state: State) =
                 TodoList = nextTodoList
                 TodoBeingEdited = state.TodoBeingEdited |> List.filter (fun x -> x.Id <> todoId) }
 
-    | SetEditedDescription (todoId, newText) ->
+    | SetEditedDescription(todoId, newText) ->
         let nextEditModel = { Id = todoId; Description = newText }
-            
-        let oldEditModelExcluded = (state.TodoBeingEdited |> List.filter (fun x -> x.Id <> todoId))
-        
+
+        let oldEditModelExcluded =
+            (state.TodoBeingEdited |> List.filter (fun x -> x.Id <> todoId))
+
         { state with
-            TodoBeingEdited = nextEditModel::oldEditModelExcluded }
+            TodoBeingEdited = nextEditModel :: oldEditModelExcluded }
 
     | FilterSelected filter -> { state with Filter = filter }
 
@@ -177,8 +183,11 @@ let renderTodo (todo: Todo) (dispatch: Msg -> unit) =
 
 
 let renderEditForm (state: State) (todoBeingEdited: TodoBeingEdited) (dispatch: Msg -> unit) =
-    let todo = state.TodoList |> List.filter (fun x -> x.Id = todoBeingEdited.Id) |> List.head
+    let todo =
+        state.TodoList |> List.filter (fun x -> x.Id = todoBeingEdited.Id) |> List.head
+
     let noChange = todo.Description = todoBeingEdited.Description
+
     div
         [ "box" ]
         [ div
@@ -188,7 +197,7 @@ let renderEditForm (state: State) (todoBeingEdited: TodoBeingEdited) (dispatch: 
                     [ Html.input
                           [ prop.classes [ "input"; "is-medium" ]
                             prop.valueOrDefault todoBeingEdited.Description
-                            prop.onTextChange (fun ev -> dispatch (SetEditedDescription (todoBeingEdited.Id, ev))) ] ]
+                            prop.onTextChange (fun ev -> dispatch (SetEditedDescription(todoBeingEdited.Id, ev))) ] ]
 
                 div
                     [ "control"; "buttons" ]
@@ -208,14 +217,15 @@ let todoList (state: State) (dispatch: Msg -> unit) =
         | All -> state.TodoList
         | Completed -> state.TodoList |> List.filter _.Completed
         | NotCompleted -> state.TodoList |> List.filter (fun x -> not x.Completed)
-        
+
     Html.ul
         [ prop.children
               [ for todo in todoList ->
                     let beingEdited = state.TodoBeingEdited |> List.exists (fun x -> x.Id = todo.Id)
+
                     if beingEdited then
-                           let todoBeingEdited = state.TodoBeingEdited |> List.find (fun x -> x.Id = todo.Id)
-                           renderEditForm state todoBeingEdited dispatch
+                        let todoBeingEdited = state.TodoBeingEdited |> List.find (fun x -> x.Id = todo.Id)
+                        renderEditForm state todoBeingEdited dispatch
                     else
                         renderTodo todo dispatch ] ]
 
