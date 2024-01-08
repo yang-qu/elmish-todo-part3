@@ -2,7 +2,6 @@
 
 ### Setup 
 ```bash
-dotnet tool install femto --global
 dotnet tool restore
 cd src
 femto --resolve
